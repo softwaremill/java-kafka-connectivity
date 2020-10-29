@@ -1,0 +1,29 @@
+plugins {
+    id 'java'
+}
+
+group 'com.softwaremill'
+version '0.0.1'
+
+allprojects {
+    repositories {
+        jcenter()
+    }
+}
+
+subprojects {
+    version = '1.0'
+
+    java {
+        sourceCompatibility = JavaVersion.toVersion('11')
+        targetCompatibility = JavaVersion.toVersion('11')
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+test {
+    useJUnitPlatform()
+}

@@ -1,0 +1,9 @@
+kafka:
+  bootstrap:
+    servers: localhost:9092
+  consumers:
+    micronaut-group:
+      key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value.deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      client-id: micronaut-kafka-client
+      topic: topic3

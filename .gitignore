@@ -1,1 +1,8 @@
+/build/
 /.idea/
+/.gradle/
+/spring-boot/build/
+/vert-x/build/
+/akka-streams/build/
+/micronaut/build/
+/plain-java/build/

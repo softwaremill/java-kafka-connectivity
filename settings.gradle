@@ -1,0 +1,14 @@
+pluginManagement {
+    repositories {
+        mavenLocal()
+        gradlePluginPortal()
+    }
+}
+
+rootProject.name = 'java-kafka-connectivity'
+include 'plain-java'
+include 'spring-boot'
+include 'micronaut'
+include 'vert-x'
+include 'akka-streams'
+
