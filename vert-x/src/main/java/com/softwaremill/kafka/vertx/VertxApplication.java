@@ -8,7 +8,9 @@ import io.vertx.core.DeploymentOptions;
 import io.vertx.core.json.JsonObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.admin.KafkaAdminClient;
+import org.apache.kafka.clients.admin.TopicDescription;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.common.KafkaFuture;
 
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Collections;
@@ -23,24 +25,13 @@ public class VertxApplication extends AbstractVerticle {
 
     @Override
     public void start() {
-        ConfigStoreOptions fileStore = new ConfigStoreOptions()
-                .setType("file")
-                .setFormat("properties")
-                .setConfig(new JsonObject().put("path", "vertx.properties").put("raw-data", true));
-        ConfigStoreOptions envStore = new ConfigStoreOptions()
-                .setType("sys");
-        ConfigRetrieverOptions options = new ConfigRetrieverOptions()
-                .addStore(fileStore)
-                .addStore(envStore);
-        ConfigRetriever retriever = ConfigRetriever.create(vertx, options);
-
-        retriever.getConfig(json -> {
-            JsonObject result = json.result();
-            String topic = result.getString("consumer.topic");
-            Map<String, String> kafkaConfig = getKafkaConfig(result);
+        configRetriever().getConfig(json -> {
+            JsonObject config = json.result();
+            String topic = config.getString("consumer.topic");
+            Map<String, String> kafkaConfig = getKafkaConfig(config);
 
             ConsumerType type = ConsumerType.valueOf(
-                    result.getString("consumer.type").toUpperCase());
+                    config.getString("consumer.type").toUpperCase());
 
             DeploymentOptions deploymentOptions = workerDeploymentOptions();
             if (SINGLE == type) {
@@ -51,23 +42,29 @@ public class VertxApplication extends AbstractVerticle {
         });
     }
 
+    private ConfigRetriever configRetriever() {
+        ConfigStoreOptions fileStore = new ConfigStoreOptions()
+                .setType("file")
+                .setFormat("properties")
+                .setConfig(new JsonObject().put("path", "vertx.properties").put("raw-data", true));
+        ConfigStoreOptions envStore = new ConfigStoreOptions()
+                .setType("sys");
+        ConfigRetrieverOptions options = new ConfigRetrieverOptions()
+                .addStore(fileStore)
+                .addStore(envStore);
+        return ConfigRetriever.create(vertx, options);
+    }
+
     private void runSingleVertex(String topic, Map<String, String> kafkaConfig, DeploymentOptions deploymentOptions) {
         vertx.deployVerticle(
                 () -> KafkaVerticle.create(topic, kafkaConfig),
                 deploymentOptions,
-                async -> log.info("Kafka consumer deployed. DeploymentId: {}", async.result())
+                async -> log.info("Single Kafka consumer deployed. DeploymentId: {}", async.result())
         );
     }
 
     private void runPartitionedVertices(String topic, Map<String, String> kafkaConfig, DeploymentOptions deploymentOptions) {
-        Map<String, Object> adminClientConfig = kafkaConfig
-                .entrySet().stream()
-                .map(e -> new SimpleImmutableEntry<String, Object>(e.getKey(), e.getValue()))
-                .collect(toMap(SimpleImmutableEntry::getKey, SimpleImmutableEntry::getValue));
-        KafkaAdminClient.create(adminClientConfig)
-                .describeTopics(Collections.singletonList(topic))
-                .values()
-                .get(topic)
+        describeTopic(topic, kafkaConfig)
                 .whenComplete(
                         (description, exc) -> {
                             if (description != null) {
@@ -79,7 +76,21 @@ public class VertxApplication extends AbstractVerticle {
                             }
                         }
                 );
+    }
 
+    private KafkaFuture<TopicDescription> describeTopic(String topic, Map<String, String> kafkaConfig) {
+        Map<String, Object> adminClientConfig = map(kafkaConfig);
+        return KafkaAdminClient.create(adminClientConfig)
+                .describeTopics(Collections.singletonList(topic))
+                .values()
+                .get(topic);
+    }
+
+    private Map<String, Object> map(Map<String, String> kafkaConfig) {
+        return kafkaConfig
+                .entrySet().stream()
+                .map(e -> new SimpleImmutableEntry<String, Object>(e.getKey(), e.getValue()))
+                .collect(toMap(SimpleImmutableEntry::getKey, SimpleImmutableEntry::getValue));
     }
 
     private void deployPartitionedVertices(String topic, Map<String, String> kafkaConfig, DeploymentOptions deploymentOptions, int numberOfPartitions) {
@@ -88,7 +99,7 @@ public class VertxApplication extends AbstractVerticle {
                     vertx.deployVerticle(
                             () -> KafkaPartitionedVerticle.create(topic, partition, kafkaConfig),
                             deploymentOptions,
-                            async -> log.info("Kafka consumer deployed. DeploymentId: {}", async.result())
+                            async -> log.info("Partitioned Kafka consumer deployed. DeploymentId: {}", async.result())
                     );
                 });
     }

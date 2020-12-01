@@ -29,9 +29,9 @@ class KafkaPartitionedVerticle extends AbstractVerticle {
     public void start() {
         KafkaConsumer.create(vertx, kafkaConfig)
                 .assign(new TopicPartition(topic, partition), AsyncResult::result)
-                .handler(record -> log.info("Vertx Kafka consumer. Message read: partition {} key {} value {}", record.partition(), record.key(), record.value()))
+                .handler(record -> log.info("Partitioned Kafka consumer. Message read: partition {} key {} value {}", record.partition(), record.key(), record.value()))
                 .endHandler(v -> log.info("End of data. Topic: {}, partition: {}", this.topic, this.partition))
-                .exceptionHandler(e -> log.error("Vertx Kafka consumer error", e));
+                .exceptionHandler(e -> log.error("Partitioned Kafka consumer error", e));
     }
 
 }
