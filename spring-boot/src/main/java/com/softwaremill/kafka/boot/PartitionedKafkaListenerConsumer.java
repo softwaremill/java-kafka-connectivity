@@ -18,7 +18,7 @@ public class PartitionedKafkaListenerConsumer {
                     @TopicPartition(topic = "${spring.kafka.consumer.topic}", partitions = {"0"})
             })
     public void partition0(ConsumerRecord<String, String> content) {
-        log.info("PKLC Record received: partition 0, key {}, value {}", content.key(), content.value());
+        log.info("Partitioned KLC Record received: partition 0, key {}, value {}", content.key(), content.value());
     }
 
     @KafkaListener(
@@ -28,7 +28,7 @@ public class PartitionedKafkaListenerConsumer {
                     @TopicPartition(topic = "${spring.kafka.consumer.topic}", partitions = {"1"})
             })
     public void partition1(ConsumerRecord<String, String> content) {
-        log.info("PKLC Record received: partition 1, key {}, value {}", content.key(), content.value());
+        log.info("Partitioned KLC Record received: partition 1, key {}, value {}", content.key(), content.value());
     }
 
     @KafkaListener(
@@ -38,7 +38,7 @@ public class PartitionedKafkaListenerConsumer {
                     @TopicPartition(topic = "${spring.kafka.consumer.topic}", partitions = {"2"})
             })
     public void partition2(ConsumerRecord<String, String> content) {
-        log.info("PKLC Record received: partition 2, key {}, value {}", content.key(), content.value());
+        log.info("Partitioned KLC Record received: partition 2, key {}, value {}", content.key(), content.value());
     }
 
 }
