@@ -18,7 +18,6 @@ class KafkaProducerTest {
         Properties props = new Properties();
         props.put("bootstrap.servers", "localhost:9092");
         props.put("retries", 0);
-        props.put("batch.size", 16384);
         props.put("linger.ms", 1);
         props.put("buffer.memory", 33554432);
         props.put("key.serializer",
@@ -28,7 +27,7 @@ class KafkaProducerTest {
         props.put("batch.size", 9);
         var producer = new KafkaProducer<String, String>(props);
 
-        IntStream.range(0, 1200)
+        IntStream.range(0, 30)
                 .forEach(i -> {
                     var partition = i % 3;
                     ProducerRecord<String, String> record = new ProducerRecord<>("topic3", partition, "key" + i, "mess" + i);
