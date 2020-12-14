@@ -30,7 +30,7 @@ class KafkaProducerTest {
         IntStream.range(0, 30)
                 .forEach(i -> {
                     var partition = i % 3;
-                    ProducerRecord<String, String> record = new ProducerRecord<>("topic3", partition, "key" + i, "mess" + i);
+                    ProducerRecord<String, String> record = new ProducerRecord<>("some_topic", partition, "key" + i, "mess" + i);
                     System.out.println("sending " + partition + " " + i);
                     try {
                         producer.send(record).get();

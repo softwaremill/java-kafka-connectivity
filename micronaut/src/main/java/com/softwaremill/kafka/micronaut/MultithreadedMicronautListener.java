@@ -9,11 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 //@KafkaListener(groupId = "micronaut-group", clientId = "${kafka.consumers.micronaut-group.client-id}", threads = 5)
 public class MultithreadedMicronautListener {
 
-    // https://blog.wick.technology/configuring-micronaut-kakfa-serdes/
-    // https://micronaut-projects.github.io/micronaut-kafka/latest/guide/#kafkaListener
-    // https://github.com/micronaut-projects/micronaut-kafka
-    // https://piotrminkowski.com/2019/08/06/kafka-in-microservices-with-micronaut/
-
 //    @Topic("${kafka.consumers.micronaut-group.topic}")
     void receive(@KafkaKey String key, String value, int partition) {
         switch (partition) {

@@ -6,4 +6,4 @@ spring:
       client-id: spring-boot-client
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      topic: topic3
+      topic: some_topic
