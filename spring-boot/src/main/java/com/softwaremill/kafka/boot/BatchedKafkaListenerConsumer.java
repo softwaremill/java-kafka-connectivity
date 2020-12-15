@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Slf4j
-@Component
+//@Component
 public class BatchedKafkaListenerConsumer {
 
     @KafkaListener(

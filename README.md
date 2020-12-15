@@ -1,7 +1,12 @@
 Java Kafka connectivity
 ===============
 
-Before running any application or Spring test producing sample messages, run docker-compose. It starts a local Kafka deployment.
+Before running any application or Spring test producing sample messages, run
+`docker-compose up`
+to start a local Kafka deployment.
+
+Then, create a partitioned topic, e.g.:
+`./kafka-topics.sh --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 3 --topic some_topic`
 
 Plain Java
 ---------------
@@ -15,7 +20,7 @@ You can start it using `BootApplication` class. Various containers and message l
 
 Micronaut
 ---------------
-Micronaut version of Kafka consumer can be started by running `MicronautApplicaiton` class. As in Sppring Boot example, here you can find some code commented out as well.
+The Micronaut version of Kafka consumer can be started by running `MicronautApplicaiton` class. As in Sppring Boot example, here you can find some code commented out as well.
 
 Akka Streams
 ---------------
